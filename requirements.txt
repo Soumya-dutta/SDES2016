@@ -1,0 +1,11 @@
+Proper use of git
+
+Test and coverage
+
+Automation
+
+Documentation
+
+Code Cleanliness(PEP 8)
+
+Content
