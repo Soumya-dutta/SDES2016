@@ -52,7 +52,7 @@ def offdiagonal(node_number_from,node_number_to,from_list,to_list,element_list,v
         elif 'L' in element_list[x] and (from_list[x]==node_number_from and to_list[x]==node_number_to):
             cond_ele=cond_ele+float(-1/value_list[x])/s
         elif 'C' in element_list[x] and (from_list[x]==node_number_from and to_list[x]==node_number_to):
-            cond_ele=cond_ele+float(-1*value_list[x]*s)
+            cond_ele=cond_ele+float(-1*value_list[x])*s
     return cond_ele
 
 #This function builds up the conductance matrix of the system 
