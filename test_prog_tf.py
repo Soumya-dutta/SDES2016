@@ -33,4 +33,22 @@ def test_conductance_matrix():
     e,v=["R1","R2","L1","C1","R3","R4","V1"],[10.0,10.0,10.0,1e-6,10.0,10.0,5.0]
     assert(prog.set_cond_matrix(m,o,d,e,v))==Matrix([[0.1,-0.1,0,0],[-0.1,0.2+0.1/s,-0.1,0],[0,-0.1,0.2+1.0e-6*s,-0.1],[0,0,-0.1,0.2]])
 
+def test_voltage_matrix():
+    '''
+    This tests the formation of the volatge matrix required for nodal analysis.
+    One test case is constructed with two volatge sources, where one source is 
+    between ground(reference node) and node 1 and another voltage source is between
+    nodes 2 and 3
+
+    Again attribute will_run is added to this function
+    '''
+    m=Matrix.zeros(3,2)
+    m_trans=Matrix.zeros(2,3)
+    o,d=[1,3,1,2,3],[2,2,0,0,0]
+    e=["R1","V1","V2","R2","R3"]
+    (v,v_t)=prog.set_volt_matrix(m,m_trans,o,d,e)
+    assert(v,v_t)==(Matrix([[0,-1],[1,0],[-1,0]]),Matrix([[0,-1,1],[1,0,0]]))
+
+
 test_conductance_matrix.will_run=True
+test_voltage_matrix.will_run=True
