@@ -69,6 +69,21 @@ def set_cond_matrix(cond,origin,dest,ele,val):
                 cond[row_ind,col_ind]=parse_expr(str(off_diag_ele))
                 cond[col_ind,row_ind]=parse_expr(str(off_diag_ele))
     return cond
+    
+#This function builds the voltage matrix of the system required for nodal analysis
+    
+def set_volt_matrix(volt,volt_trans,origin,dest,ele):
+    (row,col)=np.shape(volt)
+    for row_ind in range(row):
+        for col_ind in range(col):
+            for x in range(len(origin)):
+                if ele[x]=="V"+str(col_ind+1) and origin[x]==row_ind+1:
+                    volt[row_ind,col_ind]=-1
+                    volt_trans[col_ind,row_ind]=1
+                elif ele[x]=="V"+str(col_ind+1) and dest[x]==row_ind+1:
+                    volt[row_ind,col_ind]=1
+                    volt_trans[col_ind,row_ind]=-1
+    return volt,volt_trans
 
     
 def main():
@@ -78,6 +93,11 @@ def main():
     num_nodes=max(max(or_nodes),max(des_nodes))
     conductance=Matrix.zeros(num_nodes,num_nodes)
     conductance=set_cond_matrix(conductance,or_nodes,des_nodes,type_of_element,value)
+    number_of_voltage_sources=len([1 for x in type_of_element if 'V' in x])
+    voltage=Matrix.zeros(num_nodes,number_of_voltage_sources)
+    voltage_trans=Matrix.zeros(number_of_voltage_sources,num_nodes)
+    voltage,voltage_trans=set_volt_matrix(voltage,voltage_trans,or_nodes,des_nodes,type_of_element)
+        
         
 if __name__=='__main__':
     main()
