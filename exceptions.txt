@@ -1,0 +1,11 @@
+Exceptions handled
+------------------
+
+-->Strings in origin,destination nodes and value
+-->No voltage source in circuit
+-->Element type apart from R,L,C,V entered
+-->Negative value for origin,destination node
+-->Negative/Zero value for values of R,L,C
+-->Zero value for V
+-->Same identifier entered in netlist
+-->Excess voltage sources-leads to noninvertibility of matrix 
