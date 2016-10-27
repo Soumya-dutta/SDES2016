@@ -10,6 +10,7 @@ so on.
 '''
 
 import gui_input as gui
+import gui_tf_io as gui_io
 import numpy as np
 from sympy import symbols, simplify
 from sympy.matrices import Matrix
@@ -107,6 +108,75 @@ def set_volt_matrix(volt, volt_trans, origin, dest, ele):
     return volt, volt_trans
 
 
+def output_tf_calc(solution, o, d, e_v, e_t, ident, output_var):
+
+    '''This function takes the following arguments:
+    solution- dictionary containing solutions of the circuit unknowns
+    o- list containing the originating nodes in the circuit
+    d- list containing the terminating nodes in the circuit
+    e_v- list containing the element values of the circuit
+    e_t- list containing all the identifiers of the circuit elements
+    ident- identifier of the required element whose output parameter is sought
+    output_var- tells whether user demands current(I) or voltage(V)
+
+    Depending on the value of the originating and ending node of the identifier
+    required volt_diff is calculated. Further depending on the type of ident
+    that is R,L,C,V the current throught the element is calculated.
+
+    If output_var = "V", the volt_diff is returned
+    If output_var = "I", the variable current is returned.
+    '''
+    s = symbols('s')
+    ind = e_t.index(ident)
+    origin_node, ending_node, value_of_element = o[ind], d[ind], e_v[ind]
+    if origin_node != 0 and ending_node == 0:
+        volt_diff = solution[parse_expr("V_"+str(origin_node))]-parse_expr("0")
+    elif origin_node == 0 and ending_node != 0:
+        volt_diff = parse_expr("0")-solution[parse_expr("V_"+str(ending_node))]
+    else:
+        volt_diff = solution[parse_expr("V_"+str(origin_node))]-solution[
+                                       parse_expr("V_"+str(ending_node))]
+    if 'R' in ident:
+        current = volt_diff/value_of_element
+    elif 'L' in ident:
+        current = volt_diff/((value_of_element)*s)
+    elif 'C' in ident:
+        current = volt_diff*value_of_element*s
+    else:
+        current = solution[parse_expr("I_"+ident)]
+
+    if output_var == 'V':
+        return simplify(volt_diff)
+    else:
+        return simplify(current)
+
+
+def input_output_calculation(sol, or_list, des_list, element_type,
+                             element_value, voltage_sources_num):
+
+    '''This functions interfaces the gui functionality provided by gui_tf_io.py
+    with this program. Once the netlist entered by the user passes all the
+    checks the user has to select the input and output of the transfer function
+    Input value is directly received by this function from gui_tf_io.py
+    Output value has to be calculated. gui_tf_io.py creates two variables
+    for sending the output demanded.
+
+    For eg: if current through element L1 in any circuit is demanded,
+    output_type variable is set to I
+    ele_identifier is set to L1.
+
+    This information is used by the called function output_tf_calc
+    '''
+    gui_tf_input_calc = gui_io.Input_selection(element_type, element_value,
+                                               voltage_sources_num)
+    gui_tf_output = gui_io.Output_selection(element_type)
+    tf_numerator = output_tf_calc(sol, or_list, des_list, element_value,
+                                  element_type, gui_tf_output.ele_identifier,
+                                  gui_tf_output.output_type)
+    tf_denominator = simplify(gui_tf_input_calc.inpval)
+    print(simplify(tf_numerator/tf_denominator))
+
+
 def check_circuit_error(unknowns, tot_mat, rhs):
 
     '''Handles exceptions that may arise due to errors in the circuit entered
@@ -117,7 +187,6 @@ def check_circuit_error(unknowns, tot_mat, rhs):
     Both of the above cases lead to non-invertibility of the main matrix in
     nodal analysis. Thus both of them are handled.
     '''
-    global soln
     soln = {}
     error_flag = 0
     for x in range(np.shape(unknowns)[0]):
@@ -129,6 +198,8 @@ def check_circuit_error(unknowns, tot_mat, rhs):
             soln[unknowns[x, 0]] = simplify((tot_mat.inv()*rhs)[x, 0])
     if error_flag == 1:
         main()
+    else:
+        return soln
 
 
 def main():
@@ -173,8 +244,9 @@ def main():
             ind = list(type_of_element).index("V"+str(x+1))
             voltage_source[x, 0] = value[ind]
         rhs = current_node.col_join(voltage_source)
-        check_circuit_error(unknowns, tot_mat, rhs)
-        print(soln)
+        soln = check_circuit_error(unknowns, tot_mat, rhs)
+        input_output_calculation(soln, or_nodes, des_nodes, type_of_element,
+                                 value, number_of_voltage_sources)
 
 
 if __name__ == '__main__':
