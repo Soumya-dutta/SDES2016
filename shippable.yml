@@ -10,9 +10,9 @@ install:
     - pip install numpy
     - pip install sympy
     - pip install coverage
-    - pip install Tkinter
+    - apt-get install python-tk
 
-#Folders for reports
+# Folders for reports
 
 before_script:
     - mkdir -p shippable/testresults
