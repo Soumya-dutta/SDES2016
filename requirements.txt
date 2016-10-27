@@ -1,11 +1,3 @@
-Proper use of git
-
-Test and coverage
-
-Automation
-
-Documentation
-
-Code Cleanliness(PEP 8)
-
-Content
+sympy==1.0
+numpy==1.11.0
+Tkinter==8.6
