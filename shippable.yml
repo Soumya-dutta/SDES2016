@@ -11,7 +11,6 @@ install:
     - pip install sympy
     - pip install coverage
     - apt-get install python-tk
-    - pip install python-coveralls
 
 # Folders for reports
 
@@ -23,6 +22,3 @@ script:
     - nosetests -a will_run test_prog_tf.py --with-xunit --xunit-file=shippable/testresults/nosetests.xml
     - which python && coverage run -m nose.core test_prog_tf.py
     - which python && coverage xml -o shippable/codecoverage/coverage.xml test_prog_tf.py prog_tf.py
-
-after_success:
-    - coveralls
