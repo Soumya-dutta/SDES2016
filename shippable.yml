@@ -10,6 +10,8 @@ install:
     - pip install numpy
     - pip install sympy
     - pip install coverage
+    - pip install matplotlib
+    - pip install control
     - apt-get install python-tk
 
 # Folders for reports
