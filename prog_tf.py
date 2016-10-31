@@ -11,8 +11,9 @@ so on.
 
 import gui_input as gui
 import gui_tf_io as gui_io
+import gui_control as control
 import numpy as np
-from sympy import symbols, simplify
+from sympy import symbols, simplify, Poly
 from sympy.matrices import Matrix
 from sympy.parsing.sympy_parser import parse_expr
 
@@ -167,6 +168,7 @@ def input_output_calculation(sol, or_list, des_list, element_type,
 
     This information is used by the called function output_tf_calc
     '''
+    s = symbols('s')
     gui_tf_input_calc = gui_io.Input_selection(element_type, element_value,
                                                voltage_sources_num)
     gui_tf_output = gui_io.Output_selection(element_type)
@@ -174,7 +176,13 @@ def input_output_calculation(sol, or_list, des_list, element_type,
                                   element_type, gui_tf_output.ele_identifier,
                                   gui_tf_output.output_type)
     tf_denominator = simplify(gui_tf_input_calc.inpval)
-    print(simplify(tf_numerator/tf_denominator))
+    inp_out_tf = simplify(tf_numerator/tf_denominator)
+    num, den = inp_out_tf.as_numer_denom()
+    num_coeffs = list(Poly(num, s).coeffs())
+    den_coeffs = list(Poly(den, s).coeffs())
+    num_coeffs = [round(a, 5) for a in num_coeffs]
+    den_coeffs = [round(a, 5) for a in den_coeffs]
+    control.Options(num_coeffs, den_coeffs)
 
 
 def check_circuit_error(unknowns, tot_mat, rhs):
