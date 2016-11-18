@@ -21,6 +21,7 @@ before_script:
     - mkdir -p shippable/codecoverage
 
 script:
-    - nosetests -a will_run tests/test_prog_tf.py --with-xunit --xunit-file=shippable/testresults/nosetests.xml
+    - nosetests
+    - cd tests
     - which python && coverage run -m nose.core test_prog_tf.py
     - which python && coverage xml -o shippable/codecoverage/coverage.xml test_prog_tf.py ../cc_params/prog_tf.py
