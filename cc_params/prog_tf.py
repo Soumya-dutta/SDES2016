@@ -1,5 +1,6 @@
-'''This program is only the preliminary part of the entire exercise. The
-purpose of this program is to compute a transfer function of the network.
+"""This program is only the preliminary part of the entire exercise.
+
+The purpose of this program is to compute a transfer function of the network.
 The description of the network is provided by a netlist which has a standard
 format. From this the network is solved by nodal analysis methods. The type of
 inputs have been restricted to independent voltage sources only. The user has
@@ -7,7 +8,7 @@ to select the output s/he wants and a transfer function will be computed
 accordingly. The user will then have the option of veiwing different control
 parameters of the circuit such as time-domain response, frequency response and
 so on.
-'''
+"""
 
 import gui_input as gui
 import gui_tf_io as gui_io
@@ -19,11 +20,12 @@ from sympy.parsing.sympy_parser import parse_expr
 
 
 def diagonal(node_number, from_list, to_list, element_list, value_list):
+    """
+    Function calculates the diagonal elements of the conductance matrix.
 
-    '''This function calculates the diagonal elements of the conductance matrix
-     of the system. For diagonal elements the values are the sum of all the
-     conductances of all the elements connected to the node.
-    '''
+    For diagonal elements the values are the sum of all the conductances of all
+    the elements connected to the node.
+    """
     s = symbols('s')
     cond_ele = 0
     for x in range(len(from_list)):
@@ -66,13 +68,15 @@ def offdiagonal(node_number_from, node_number_to, from_list, to_list,
     return cond_ele
 
 
-def set_cond_matrix(cond, origin, dest, ele, val):
+def set_cond_matrix(origin, dest, ele, val):
 
     '''This function builds up the conductance matrix of the system. It fills up
      the diagonal elements by calling the function diagonal with the
      node number. Similarly the off diagonal elements of the conductance matrix
      is computed by calling the offdiagonal function.
     '''
+    num_nodes = max(max(origin), max(dest))
+    cond = Matrix.zeros(num_nodes, num_nodes)
     (row, col) = np.shape(cond)
     for row_ind in range(row):
         for col_ind in range(row_ind, col):
@@ -84,10 +88,10 @@ def set_cond_matrix(cond, origin, dest, ele, val):
                                            ele, val)
                 cond[row_ind, col_ind] = parse_expr(str(off_diag_ele))
                 cond[col_ind, row_ind] = parse_expr(str(off_diag_ele))
-    return cond
+    return cond, num_nodes
 
 
-def set_volt_matrix(volt, volt_trans, origin, dest, ele):
+def set_volt_matrix(origin, dest, ele):
 
     '''This function builds the voltage matrix of the system required for nodal
     analysis. If the positive side of the first voltage source is connected to
@@ -96,17 +100,22 @@ def set_volt_matrix(volt, volt_trans, origin, dest, ele):
     the volt_matrix with 1's replaced by -1's and vice-versa. This matrix
     volt_trans is appended to the conductance matrix column wise.
     '''
-    (row, col) = np.shape(volt)
+    num_nodes = max(max(origin), max(dest))
+    number_of_voltage_sources = len([1 for x in ele if 'V' in x])
+    voltage = Matrix.zeros(num_nodes, number_of_voltage_sources)
+    voltage_trans = Matrix.zeros(number_of_voltage_sources, num_nodes)
+    (row, col) = np.shape(voltage)
     for row_ind in range(row):
         for col_ind in range(col):
             for x in range(len(origin)):
                 if ele[x] == "V"+str(col_ind+1) and origin[x] == row_ind+1:
-                    volt[row_ind, col_ind] = -1
-                    volt_trans[col_ind, row_ind] = 1
+                    voltage[row_ind, col_ind] = -1
+                    voltage_trans[col_ind, row_ind] = 1
                 elif ele[x] == "V"+str(col_ind+1) and dest[x] == row_ind+1:
-                    volt[row_ind, col_ind] = 1
-                    volt_trans[col_ind, row_ind] = -1
-    return volt, volt_trans
+                    voltage[row_ind, col_ind] = 1
+                    voltage_trans[col_ind, row_ind] = -1
+    dep = Matrix.zeros(number_of_voltage_sources, number_of_voltage_sources)
+    return voltage, voltage_trans, dep
 
 
 def output_tf_calc(solution, o, d, e_v, e_t, ident, output_var):
@@ -147,9 +156,9 @@ def output_tf_calc(solution, o, d, e_v, e_t, ident, output_var):
         current = solution[parse_expr("I_"+ident)]
 
     if output_var == 'V':
-        return simplify(volt_diff)
+        return volt_diff
     else:
-        return simplify(current)
+        return current
 
 
 def input_output_calculation(sol, or_list, des_list, element_type,
@@ -178,11 +187,31 @@ def input_output_calculation(sol, or_list, des_list, element_type,
     tf_denominator = simplify(gui_tf_input_calc.inpval)
     inp_out_tf = simplify(tf_numerator/tf_denominator)
     num, den = inp_out_tf.as_numer_denom()
-    num_coeffs = list(Poly(num, s).coeffs())
-    den_coeffs = list(Poly(den, s).coeffs())
-    num_coeffs = [round(a, 5) for a in num_coeffs]
-    den_coeffs = [round(a, 5) for a in den_coeffs]
+    num_coeffs = list(Poly(num, s).all_coeffs())
+    den_coeffs = list(Poly(den, s).all_coeffs())
+    num_coeffs = [round(a, 10) for a in num_coeffs]
+    den_coeffs = [round(a, 10) for a in den_coeffs]
     control.Options(num_coeffs, den_coeffs)
+
+
+def nodal_matrix(cond, v, val, v_t, n_nodes, n_voltsrc, ele_type, dep_sources):
+    tot_mat_upper = cond.row_join(v)
+    tot_mat_down = v_t.row_join(dep_sources)
+    tot_mat = tot_mat_upper.col_join(tot_mat_down)
+    node_voltage = Matrix.zeros(n_nodes, 1)
+    current_voltage = Matrix.zeros(n_voltsrc, 1)
+    for n in range(1, n_nodes+1):
+        node_voltage[n-1, 0] = symbols('V_'+str(n))
+    for n in range(1, n_voltsrc+1):
+        current_voltage[n-1, 0] = symbols('I_V'+str(n))
+    unknowns = node_voltage.col_join(current_voltage)
+    current_node = Matrix.zeros(n_nodes, 1)
+    voltage_source = Matrix.zeros(n_voltsrc, 1)
+    for x in range(n_voltsrc):
+        ind = list(ele_type).index("V"+str(x+1))
+        voltage_source[x, 0] = val[ind]
+    rhs = current_node.col_join(voltage_source)
+    return unknowns, tot_mat, rhs
 
 
 def check_circuit_error(unknowns, tot_mat, rhs):
@@ -224,34 +253,15 @@ def main():
         type_of_element, value = gui_inputs.ele_type, gui_inputs.val_list
         continue_flag = 1
     if continue_flag == 1:
-        num_nodes = max(max(or_nodes), max(des_nodes))
-        conductance = Matrix.zeros(num_nodes, num_nodes)
-        conductance = set_cond_matrix(conductance, or_nodes, des_nodes,
-                                      type_of_element, value)
-        number_of_voltage_sources = len([1 for x in type_of_element if 'V' in x])
-        voltage = Matrix.zeros(num_nodes, number_of_voltage_sources)
-        voltage_trans = Matrix.zeros(number_of_voltage_sources, num_nodes)
-        voltage, voltage_trans = set_volt_matrix(voltage, voltage_trans,
-                                                 or_nodes, des_nodes,
-                                                 type_of_element)
-        dep = Matrix.zeros(number_of_voltage_sources,
-                           number_of_voltage_sources)
-        tot_mat_upper = conductance.row_join(voltage)
-        tot_mat_down = voltage_trans.row_join(dep)
-        tot_mat = tot_mat_upper.col_join(tot_mat_down)
-        node_voltage = Matrix.zeros(num_nodes, 1)
-        current_voltage = Matrix.zeros(number_of_voltage_sources, 1)
-        for n in range(1, num_nodes+1):
-            node_voltage[n-1, 0] = symbols('V_'+str(n))
-        for n in range(1, number_of_voltage_sources+1):
-            current_voltage[n-1, 0] = symbols('I_V'+str(n))
-        unknowns = node_voltage.col_join(current_voltage)
-        current_node = Matrix.zeros(num_nodes, 1)
-        voltage_source = Matrix.zeros(number_of_voltage_sources, 1)
-        for x in range(number_of_voltage_sources):
-            ind = list(type_of_element).index("V"+str(x+1))
-            voltage_source[x, 0] = value[ind]
-        rhs = current_node.col_join(voltage_source)
+        conductance, num_nodes = set_cond_matrix(or_nodes, des_nodes,
+                                                 type_of_element, value)
+        voltage, voltage_trans, dep = set_volt_matrix(or_nodes, des_nodes,
+                                                      type_of_element)
+        number_of_voltage_sources = dep.shape[1]
+        unknowns, tot_mat, rhs = nodal_matrix(conductance, voltage, value,
+                                              voltage_trans, num_nodes,
+                                              number_of_voltage_sources,
+                                              type_of_element, dep)
         soln = check_circuit_error(unknowns, tot_mat, rhs)
         input_output_calculation(soln, or_nodes, des_nodes, type_of_element,
                                  value, number_of_voltage_sources)

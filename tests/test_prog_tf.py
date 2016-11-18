@@ -1,5 +1,10 @@
-from sympy import symbols, simplify
+from sympy import symbols
 from sympy.matrices import Matrix
+import os
+import sys
+module_path = os.path.dirname(os.path.pardir + os.path.sep)
+module_path = os.path.join(module_path, "cc_params")
+sys.path.insert(0, os.path.abspath(module_path))
 import prog_tf as prog
 
 
@@ -18,29 +23,27 @@ def test_conductance_matrix():
     To run this test use: nosetests -a will_run test_prog_tf.py
     '''
     s = symbols('s')
-    m = Matrix.zeros(3, 3)
     o, d = [1, 0, 2, 1], [0, 2, 3, 3]
     e, v = ["R1", "R2", "R3", "V1"], [0.2, 0.2, 0.2, 5]
     test_output = Matrix([[5.0, 0.0, 0.0], [0, 10.0, -5.0], [0.0, -5.0, 5.0]])
-    assert(prog.set_cond_matrix(m, o, d, e, v)) == test_output
+    assert(prog.set_cond_matrix(o, d, e, v)) == (test_output, 3)
     o, d = [1, 2, 3, 1], [2, 3, 0, 0]
     e, v = ["R1", "L1", "C1", "V1"], [5.0, 10.0, 1e-6, 5.0]
     test_output = Matrix([[0.2, -0.2, 0.0], [-0.2, 0.2+0.1/s, -0.1/s],
                           [0.0, -0.1/s, 0.1/s+1e-6*s]])
-    assert(prog.set_cond_matrix(m, o, d, e, v)) == test_output
+    assert(prog.set_cond_matrix(o, d, e, v)) == (test_output, 3)
     o, d = [1, 2, 3, 3, 3, 1], [2, 3, 0, 0, 0, 0]
     e = ["R1", "C1", "C2", "L1", "R2", "V1"]
     v = [10.0, 1e-6, 1e-6, 10.0, 5.0, 5.0]
     test_output = Matrix([[0.1, -0.1, 0], [-0.1, 0.1+1e-6*s, -1e-6*s],
                           [0, -1e-6*s, 2*s*1e-6+0.1/s+0.2]])
-    assert(prog.set_cond_matrix(m, o, d, e, v)) == test_output
-    m = Matrix.zeros(4, 4)
+    assert(prog.set_cond_matrix(o, d, e, v)) == (test_output, 3)
     o, d = [1, 2, 2, 3, 3, 4, 1], [2, 3, 0, 0, 4, 0, 0]
     e = ["R1", "R2", "L1", "C1", "R3", "R4", "V1"]
     v = [10.0, 10.0, 10.0, 1e-6, 10.0, 10.0, 5.0]
     test_output = Matrix([[0.1, -0.1, 0, 0], [-0.1, 0.2+0.1/s, -0.1, 0],
                           [0, -0.1, 0.2+1e-6*s, -0.1], [0, 0, -0.1, 0.2]])
-    assert(prog.set_cond_matrix(m, o, d, e, v)) == test_output
+    assert(prog.set_cond_matrix(o, d, e, v)) == (test_output, 4)
 
 
 def test_voltage_matrix():
@@ -53,14 +56,12 @@ def test_voltage_matrix():
 
     Again attribute will_run is added to this function
     '''
-    m = Matrix.zeros(3, 2)
-    m_trans = Matrix.zeros(2, 3)
     o, d = [1, 3, 1, 2, 3], [2, 2, 0, 0, 0]
     e = ["R1", "V1", "V2", "R2", "R3"]
-    (v, v_t) = prog.set_volt_matrix(m, m_trans, o, d, e)
+    (v, v_t, dep) = prog.set_volt_matrix(o, d, e)
     test_output = (Matrix([[0, -1], [1, 0], [-1, 0]]),
-                   Matrix([[0, -1, 1], [1, 0, 0]]))
-    assert(v, v_t) == test_output
+                   Matrix([[0, -1, 1], [1, 0, 0]]), Matrix([[0, 0], [0, 0]]))
+    assert(v, v_t, dep) == test_output
 
 
 def test_output_tf_calc():
@@ -90,15 +91,34 @@ def test_output_tf_calc():
     o, d = [1, 2, 3, 1], [2, 3, 0, 0]
     ident, val = ["R1", "L1", "C1", "V1"], [10, 0.01, 1e-6, 10]
     test_out = prog.output_tf_calc(sol, o, d, val, ident, "L1", "I")
-    assert(test_out) == simplify(sol[iv1])
+    assert(test_out) == sol[iv1]
     test_out = prog.output_tf_calc(sol, o, d, val, ident, "L1", "V")
-    assert(test_out) == simplify(sol[iv1]*0.01*s)
+    assert(test_out) == sol[iv1]*0.01*s
     test_out = prog.output_tf_calc(sol, o, d, val, ident, "C1", "V")
-    assert(test_out) == simplify(sol[v3])
+    assert(test_out) == sol[v3]
     test_out = prog.output_tf_calc(sol, o, d, val, ident, "V1", "V")
     assert(test_out) == 10.0
+
+
+def test_nodal_matrix():
+
+    s, V_1, V_2 = symbols('s'), symbols('V_1'), symbols('V_2')
+    V_3, I_V1 = symbols('V_3'), symbols('I_V1')
+    m = Matrix([[0.2, -0.2, 0.0, -1.0], [-0.2, 0.2+0.1/s, -0.1/s, 0.0],
+                [0.0, -0.1/s, 0.1/s+1e-6*s, 0.0], [1.0, 0.0, 0.0, 0.0]])
+    unknowns = Matrix([[V_1], [V_2], [V_3], [I_V1]])
+    rhs = Matrix([[0.0], [0.0], [0.0], [5.0]])
+    c = Matrix([[0.2, -0.2, 0.0], [-0.2, 0.2+0.1/s, -0.1/s],
+                [0.0, -0.1/s, 0.1/s+1e-6*s]])
+    v, v_t = Matrix([[-1.0], [0.0], [0.0]]), Matrix([[1.0, 0.0, 0.0]])
+    n_nodes, n_voltsrc, val = 3, 1, [5.0, 10.0, 1e-6, 5.0]
+    ele_type, dep = ["R1", "L1", "C1", "V1"], Matrix([[0.0]])
+    u, mat, r = prog.nodal_matrix(c, v, val, v_t, n_nodes, n_voltsrc,
+                                  ele_type, dep)
+    assert(mat, u, r) == (m, unknowns, rhs)
 
 
 test_conductance_matrix.will_run = True
 test_voltage_matrix.will_run = True
 test_output_tf_calc.will_run = True
+test_nodal_matrix.will_run = True
