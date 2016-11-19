@@ -1,15 +1,31 @@
+"""
+Create GUI interface for the user to enter the netlist.
+
+Also gives the option re-entering netlist if entered netlist is erroneous.
+"""
 from Tkinter import Tk, Button, Label, Entry, OptionMenu, StringVar
 from Tkinter import Radiobutton
 import Tkinter as tk
 
 
 class Error():
+    """
+    Handles if error is present in the circuit/netlist.
 
-    '''
-    Instance of this class is created and used by prog_tf.py only whenever
-    there is an error in the netlist entered by the user.
-    '''
+    Gives the option of re-entering.
+    """
+
     def __init__(self, msg):
+        """
+        Initialize an Instance of the class Error.
+
+        Parameters
+        ----------
+
+        - **msg**: error message to inform the user of the error in the circuit
+
+        Creates a GUI window with title Re-enter Netlist?
+        """
         self.err_msg = msg
         print(self.err_msg)
         self.root = Tk()
@@ -19,15 +35,12 @@ class Error():
         self.root.mainloop()
 
     def options(self):
+        """
+        Create radio buttons for accepting user input.
 
-        '''
-        This function creates radiobuttons which asks the user if s/he wants
-        to continue or not. Depending on the decision of the user prog_tf.py
-        takes appropriate actions.
-        If Yes- Input_screen will be called again and the user is asked to
-                enter a new netlist again
-        If No- Program terminates.
-        '''
+        Radiobutton Yes is created for user to re-enter netlist
+        Radiobutton No is created for user to quit.
+        """
         self.v = StringVar()
         Label(self.root, text=self.err_msg).grid(row=0, column=0, sticky='news')
         Radiobutton(self.root, text="Yes", variable=self.v, value="Yes",
@@ -38,11 +51,12 @@ class Error():
                                              pady=4)
 
     def close(self):
+        """
+        Close window after dispalying appropriate information.
 
-        '''
-        Closes the Re-enter window after displaying appropriate message to the
-        terminal.
-        '''
+        If user chooses to continue the decision variable is set to Yes and
+        the user has to re-enter netlist, else the program quits.
+        """
         self.decision = str(self.v.get())
         if self.decision == "Yes":
             print("You chose to re-enter")
@@ -52,7 +66,37 @@ class Error():
 
 
 class Input_screen():
+    """
+    Create an input interface for the user to enter netlist.
+
+    Asks user for number of elements in the circuit. Creates a table sort of
+    input interface for the user for entering the netlist. Errors are also
+    checked.
+    """
+
     def __init__(self):
+        """
+        Initialize Instance of class Input_screen.
+
+        Create GUI window with title Enter the netlist
+
+        Variables
+        ---------
+
+        - **origin_node_list[]**: list of originating nodes as Tkinter objects
+        - **destination_node_list[]**: list of terminating nodes as Tkinter
+                                       objects
+        - **element_type_list[]**: list of types of element as Tkinter objects
+        - **element_value_list[]**: list of values of element as Tkinter
+                                    objects
+        - **origin_list[]**: list of originating nodes in circuit
+        - **destination_list[]**: list of terminating nodes in circuit
+        - **ele_type[]**: list of element types in circuit
+        - **val_list[]**: list of element values in circuit
+        - **error_msg**: stores the error message in case there is an error
+        - **error_flag**: set to 1 if there is an error else 0
+
+        """
         self.origin_node_list = []
         self.destination_node_list = []
         self.element_type_list = []
@@ -66,14 +110,14 @@ class Input_screen():
         self.root = Tk()
         self.root.title("Enter the netlist")
         self.accept_number_of_elements()
-        # self.check_netlist_error()
         self.root.mainloop()
 
     def accept_number_of_elements(self):
-
         """
-        Asks the user for the number of elements in the circuit. Updates the
-        GUI window accordingly in the function self.show_rows()
+        Accept number of elements in the circuit from user.
+
+        the number entered by user is stored in the variable num_el_field.
+        function show_rows() is called subsequently.
         """
         Label(self.root, text="Enter number of Elements:").grid(row=0,
                                                                 column=0,
@@ -86,11 +130,16 @@ class Input_screen():
                                                                     pady=4)
 
     def show_rows(self):
-
         """
-        Depending on the number of elements entered by the user, this function
-        creates appropriate number of rows in the window for entering the
-        information about the elements present in the circuit.
+        User enters netlist in rows provided based on number of elements.
+
+        The user has to enter the netlist under the following heads
+        - From: Origin node of elements
+        - To: Destination node of elements
+        - Type of element to be selected from drop-down menu
+        - Value: Value of the element entered.
+
+        Once netlist is entered user has to click on Save to load the netlist.
         """
         num_el = int(self.num_el_field.get())
         Label(self.root, text="From").grid(row=1, column=0, sticky='news')
@@ -118,14 +167,14 @@ class Input_screen():
                                                      sticky=tk.W, pady=4)
 
     def store_entry_fields(self):
-
         """
-        Depending on the input of the user via the GUI, this function creates
-        lists of the data entered. The lists created are as follows:-
-        origin_list - Stores all the origin nodes f netlist
-        destination_list - Stores all the destination nodes of netlist
-        val_list- Stores the values of the different elements of circuit
-        ele_type- Stores the types of passive elements in circuit
+        Store the netlist data in the form of lists.
+
+        The lists created are as follows:-
+        - origin_list : Stores all the origin nodes of netlist
+        - destination_list : Stores all the destination nodes of netlist
+        - val_list : Stores the values of the different elements of circuit
+        - ele_type : Stores the types of passive elements in circuit
         """
         volt, res, ind, cap = 0, 0, 0, 0
         for i in self.origin_node_list:
@@ -150,15 +199,15 @@ class Input_screen():
         self.check_netlist_error()
 
     def check_netlist_error(self):
+        """
+        Exception due to errors in netlist input by user handled.
 
-        '''
-        Handles exceptions that may arise due to errors in netlist input by
-        user.
         List of exceptions handled are:-
-            -Negative value of nodes
-            -No voltage sources in netlist
-            -Negative/Zero value of R,L,C
-            -Zero value of V
+        - Negative value of nodes
+        - No voltage sources in netlist
+        - Negative/Zero value of R,L,C
+        - Zero value of V
+
         If negative value of the voltage source is given the origin and
         destination nodes of the source are reversed for computational
         simplicity
@@ -166,7 +215,7 @@ class Input_screen():
         Whenever an error is encountered in the netlist error_flag is set 1
         An error_msg is also created appropriately. Both of these are handled
         by the program prog_tf.py
-        '''
+        """
         if len(self.ele_type) < len(self.val_list):
             self.error_flag = 1
             self.error_msg = "You have not entered all identifiers."
@@ -197,7 +246,6 @@ class Input_screen():
                 self.root.destroy()
                 return
             if self.val_list[ind] < 0 and 'V' in self.ele_type[ind]:
-                # print("Reversing polarity of voltage source")
                 self.val_list[ind] = abs(self.val_list[ind])
                 o, d = self.origin_list[ind], self.destination_list[ind]
                 self.origin_list[ind], self.destination_list[ind] = d, o

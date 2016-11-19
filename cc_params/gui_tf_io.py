@@ -1,29 +1,29 @@
+"""
+Create GUI interface for user to select input and output for transfer function.
+
+Displays options to the user to select the input and output from the circuit
+to be considered for transfer function computation.
+"""
 from Tkinter import Tk, Button, IntVar, StringVar, Label, Radiobutton
 import Tkinter as tk
 
 
 class Input_selection():
-    """Class for creating GUI for input selection by user
-    Methods in class:
-    -----------------
-    __init__ - initializes the different class variables as follows:
-               root- A Tkinter window where the GUI will be shown
-               passive_element_list - A list storing the different circuit
-                                      elements in the netlist
-               element_values - A list storing all the values of circuit
-                                elements
-               num_volt_sources - number if voltage sources in the circuit
+    """Class for creating GUI for input selection by user."""
 
-    options_input - Depending on the number of voltage sources in the circuit
-                    the user is given options of selecting any one of them.
-                    This choice is given by a Radiobutton. After selection, the
-                    user has to confirm his/her selection by clicking on
-                    Confirm selection of input.
-    compute_val - After user selects an input, the value of the required
-                  identifier is read from the list and stored in the variable
-                  inpval.
-    """
     def __init__(self, identifiers, values, number_of_options):
+        """
+        Initialize Instance of class Input_selection.
+
+        Parameters
+        ----------
+
+        - **identifiers**: list of types of elements in the circuit
+        - **values**: list of element values in the circuit
+        - **number_of_options**: number of voltage sources in circuit.
+
+        A GUI with title Select your input for transfer function is created.
+        """
         self.root = Tk()
         self.passive_element_list = identifiers
         self.element_values = values
@@ -33,6 +33,13 @@ class Input_selection():
         self.root.mainloop()
 
     def options_input(self):
+        """
+        Input is selected by the user from options provided via radiobuttons.
+
+        If there are *n* voltage sources in the circuit, *n* radiobuttons are
+        given as optons to the user. The user can select any one and then
+        clicks on Confirm selection of input.
+        """
         self.v = IntVar()
         Label(self.root, text="Options for input").grid(row=0, column=0,
                                                         sticky='news')
@@ -45,28 +52,26 @@ class Input_selection():
                                               pady=4)
 
     def compute_val(self):
+        """Value of the voltage source selected by user is stored in inpval."""
         ind = self.passive_element_list.index("V"+str(self.v.get()))
         self.inpval = self.element_values[ind]
         self.root.destroy()
 
 
 class Output_selection():
-    """Class creates a GUI for providing different output selection options
-    to user
-    Methods in class:
-    -----------------
-    __init__ - initializes the different class variables as follows:
-               root- A Tkinter window where the GUI will be shown
-               element_list - A list storing the different circuit
-                              elements in the netlist
-    options_output - Provides options to user for selecting output as
-                     either voltage/current in any of the elements
-    output_selected - creates two variables ele_identifier and output_type.
-                      If user wants to have "Current though L1 as output"
-                      ele_identifier is set to "L1"
-                      output_type is set to "I"
-    """
+    """Class for creating GUI for output selection by user."""
+
     def __init__(self, identifiers):
+        """
+        Initialize Instance of class Output_selection.
+
+        Parameters
+        ----------
+
+        - **identifiers**: list of types of elements in the circuit.
+
+        A GUI with title Select your output for transfer function is created.
+        """
         self.root = Tk()
         self.element_list = identifiers
         self.root.title("Select your output for transfer function")
@@ -74,6 +79,12 @@ class Output_selection():
         self.root.mainloop()
 
     def options_output(self):
+        """
+        Output is selected by the user from options provided via radiobuttons.
+
+        Options are provided for selecting current through any element or
+        voltage across any element.
+        """
         self.v = StringVar()
         Label(self.root, text="Options for output").grid(row=0, column=0,
                                                          sticky='news')
@@ -92,6 +103,14 @@ class Output_selection():
                                                   pady=4)
 
     def output_selected(self):
+        """
+        Store the output selected by user.
+
+        Both the element and the type of output is stored.
+        For eg: if **current** through resistance **R1** is demanded then
+        self.ele_identifier is set to **R1**
+        self.output_type is set to **I**
+        """
         l = str(self.v.get()).split(':')
         self.ele_identifier = l[1]
         self.output_type = l[0]

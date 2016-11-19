@@ -1,3 +1,8 @@
+"""Calculates the transfer function of the system as demanded by user.
+
+If transfer function not a constant displays different plots such as Time
+Response, Bode, Nyquist as demanded by the user.
+"""
 import control
 import matplotlib.pyplot as plt
 import Tkinter as tk
@@ -5,14 +10,23 @@ from Tkinter import Tk, Button, Radiobutton, StringVar
 
 
 class Options():
-    '''
-    This class creates a GUI interface providing options of seeing different
-    control parameters of the transfer function demanded by the user.
-    The input to any such instance of this class are the numerator and
-    denominator, from which the transfer function is computed and options
-    are provided appropriately.
-    '''
+    """
+    Create GUI window for different control parameters of the system.
+
+    Options provided are time response, bode plot and nyquist plot.
+    """
+
     def __init__(self, numerator, denominator):
+        """
+        Create a GUI window with title Control Parameter Options.
+
+        Parameters
+        ----------
+        - numerator: numerator of the transfer function calculated in
+         prog_tf.py
+        - denominator: denominator of the transfer function calculated in
+         prog_tf.py
+        """
         self.n = numerator
         self.d = denominator
         self.root = Tk()
@@ -21,18 +35,20 @@ class Options():
         self.root.mainloop()
 
     def displayoptions(self):
-        '''
-        This function displays the different options that are given to the user
+        """
+        Function displays the different options that are given to the user.
+
         - If the transfer function is constant it is displayed in the terminal
         and the window closes.
         - If the transfer function is not constant three different options
         are provided to the user.
-            -- time-domain response for which function step is called
-            -- Bode plot for which function bode is called
-            -- Nyquist plot for which function nyq is called
+
+            - time-domain response for which function step is called
+            - Bode plot for which function bode is called
+            - Nyquist plot for which function nyq is called
 
         Radio buttons are the input method for the user.
-        '''
+        """
         self.sys = control.tf(self.n, self.d)
         print("The transfer function of the system is: ")
         print(self.sys)
@@ -59,12 +75,15 @@ class Options():
                                             sticky=tk.W, pady=4)
 
     def step(self):
-        '''
-        uses the step_response function of control module to get two arrays
-        T- timestamp against the response
-        yout- actual response data
+        """
+        Display step response of the system.
+
+        Uses the step_response function of control module to get two arrays
+
+        - T: timestamp against the response
+        - yout: actual response data
         They are then plotted using matplotlib
-        '''
+        """
         T, yout = control.step_response(self.sys)
         plt.clf()
         plt.figure(1)
@@ -76,11 +95,13 @@ class Options():
         plt.show()
 
     def bode(self):
-        '''
+        """
+        Display bode plot of the system.
+
         uses the bode module of control.
-        Plots magnitude in dB and phase in degrees with respect to the
-        Frequency in rad/s.
-        '''
+        Plots **magnitude in dB** and **phase in degrees** with respect to the
+        **Frequency in rad/s**.
+        """
         mag, phase, omega = control.bode(self.sys, dB=True)
         plt.clf()
         plt.figure(1)
@@ -100,19 +121,24 @@ class Options():
         plt.show()
 
     def nyq(self):
-        '''
+        """
+        Display Nyquist plot for the system.
+
         Uses nyquist plotting functionality of the module control.
-        '''
+        """
         plt.clf()
         plt.figure(1)
         real, imag, freq = control.nyquist(self.sys, Plot=True)
         plt.title("Nyquist Plot")
-        # plt.plot(real, imag, '-', color='b')
-        # plt.plot(real, -imag, '--', color='b')
         plt.xlabel("Re($\omega$)")
         plt.ylabel("Im($\omega$)")
         plt.grid()
         plt.show()
 
     def close(self):
+        """
+        Close the GUI window.
+
+        Called when Exit button is pressed by user.
+        """
         self.root.destroy()

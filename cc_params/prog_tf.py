@@ -1,6 +1,6 @@
-"""This program is only the preliminary part of the entire exercise.
-
+"""
 The purpose of this program is to compute a transfer function of the network.
+
 The description of the network is provided by a netlist which has a standard
 format. From this the network is solved by nodal analysis methods. The type of
 inputs have been restricted to independent voltage sources only. The user has
@@ -23,8 +23,27 @@ def diagonal(node_number, from_list, to_list, element_list, value_list):
     """
     Function calculates the diagonal elements of the conductance matrix.
 
-    For diagonal elements the values are the sum of all the conductances of all
-    the elements connected to the node.
+    Parameters
+    ----------
+
+    - **node_number**: decides the index of the conductance matrix to be
+                       computed
+    - **from_list**: list of all the origin nodes in the netlist
+    - **to_list**: list of all the destination nodes in the netlist
+    - **element_list**: list of identifiers of elements in the circuit
+    - **value_list**: list of values of elements in the circuit
+
+    Returns
+    -------
+
+    Diagonal element of the conductance matrix indexed as
+    **[node_number][node_number]**
+
+    Method
+    ------
+
+    For filling up conductance[i][i] the ith node is considered and conductance
+    of all the elements connected to this node is calculated and summed up.
     """
     s = symbols('s')
     cond_ele = 0
@@ -45,12 +64,33 @@ def diagonal(node_number, from_list, to_list, element_list, value_list):
 
 def offdiagonal(node_number_from, node_number_to, from_list, to_list,
                 element_list, value_list):
+    """
+    Function calculates the offdiagonal elements of the conductance matrix.
 
-    '''This function calculates the off-diagonal elements of the conductance
-     matrix of the system.For origin and destination nodes i and j the function
-     returns the negative of the conductance of the element connected
-     between i and j.
-    '''
+    Parameters
+    ----------
+
+    - **node_number_from**: decides the row-index of the conductance matrix to
+                            be computed
+    - **node_number_to**: decides the column-index of the conductance matrix to
+                          be computed
+    - **from_list**: of all the origin nodes in the netlist
+    - **to_list**: list of all the destination nodes in the netlist
+    - **element_list**: list of identifiers of elements in the circuit
+    - **value_list**: list of values of elements in the circuit
+
+    Returns
+    -------
+
+    OffdiagonalDiagonal element of the conductance matrix indexed as
+    **[node_number_from][node_number_to]**
+
+    Method
+    ------
+
+    For filling up conductance[i][j] the negative of the conductance of the
+    element/s connected between i and j the nodes are added up.
+    """
     s = symbols('s')
     cond_ele = 0
     for x in range(len(from_list)):
@@ -69,12 +109,32 @@ def offdiagonal(node_number_from, node_number_to, from_list, to_list,
 
 
 def set_cond_matrix(origin, dest, ele, val):
+    """
+    Function builds up the conductance matrix of the system.
 
-    '''This function builds up the conductance matrix of the system. It fills up
-     the diagonal elements by calling the function diagonal with the
-     node number. Similarly the off diagonal elements of the conductance matrix
-     is computed by calling the offdiagonal function.
-    '''
+    Parameters
+    ----------
+
+    - **origin**: list of all origin nodes of the netlist
+    - **dest**: list of all destination nodes of the netlist
+    - **ele**: list of all element identifiers of the netlist
+    - **val**: list of values of all the elements in the netlist
+
+    Returns
+    -------
+
+    - Conductance matrix of the circuit
+    - Number of nodes in the circuit
+
+    Method
+    ------
+
+    Number of nodes in the circuit is calculated by taking the maximum of all
+    destination and origin nodes.
+    **Diagonal elements** are filled up after calling function **diagonal**
+    **offdiagonal elements** are filled up after calling function
+    **offdiagonal**
+    """
     num_nodes = max(max(origin), max(dest))
     cond = Matrix.zeros(num_nodes, num_nodes)
     (row, col) = np.shape(cond)
@@ -92,14 +152,34 @@ def set_cond_matrix(origin, dest, ele, val):
 
 
 def set_volt_matrix(origin, dest, ele):
+    """
+    Function builds the voltage matrix required for nodal analysis.
 
-    '''This function builds the voltage matrix of the system required for nodal
-    analysis. If the positive side of the first voltage source is connected to
-    node i, say, then volt[0][i]=-1. Such a matrix will be appended to the
-    conductance matrix row-wise. A matrix volt_trans is also created which is
-    the volt_matrix with 1's replaced by -1's and vice-versa. This matrix
-    volt_trans is appended to the conductance matrix column wise.
-    '''
+    Parameters
+    ----------
+
+    - **origin**: list of all origin nodes of the netlist
+    - **dest**: list of all destination nodes of the netlist
+    - **ele**: list of all element identifiers of the netlist
+
+    Returns
+    -------
+
+    - voltage matrix of the circuit to be appended to conductance matrix
+      row-wise
+    - voltage_trans matrix to be appended to conductance matrix column wise
+    - A square matrix of zeros with size equal to number of Voltage sources
+
+    Method
+    ------
+
+    If positive end of ith voltage source is connected to a node j, then
+    **voltage[i][j]** = 1 and **voltage_trans[i][j]** = -1
+
+    If there are 2 voltage sources the **dep** is a (2 by 2) matrix of 0's
+
+
+    """
     num_nodes = max(max(origin), max(dest))
     number_of_voltage_sources = len([1 for x in ele if 'V' in x])
     voltage = Matrix.zeros(num_nodes, number_of_voltage_sources)
@@ -119,23 +199,34 @@ def set_volt_matrix(origin, dest, ele):
 
 
 def output_tf_calc(solution, o, d, e_v, e_t, ident, output_var):
+    """
+    Function calculates the output transfer function as demanded by the user.
 
-    '''This function takes the following arguments:
-    solution- dictionary containing solutions of the circuit unknowns
-    o- list containing the originating nodes in the circuit
-    d- list containing the terminating nodes in the circuit
-    e_v- list containing the element values of the circuit
-    e_t- list containing all the identifiers of the circuit elements
-    ident- identifier of the required element whose output parameter is sought
-    output_var- tells whether user demands current(I) or voltage(V)
+    Parameters
+    ----------
 
-    Depending on the value of the originating and ending node of the identifier
-    required volt_diff is calculated. Further depending on the type of ident
-    that is R,L,C,V the current throught the element is calculated.
+    - **solution**: dictionary containing solutions of the circuit unknowns
+    - **o**: list containing the originating nodes in the circuit
+    - **d**: list containing the terminating nodes in the circuit
+    - **e_v**: list containing the values of elements in the circuit
+    - **e_t**: list containing the type of elements in the circuit
+    - **ident**: identifier of the required element whose output parameter is
+                 sought
+    - **output_var**: I if current is demanded, else V
 
-    If output_var = "V", the volt_diff is returned
-    If output_var = "I", the variable current is returned.
-    '''
+    Returns
+    -------
+
+    Returns voltage difference across element or current through element as
+    required by user.
+
+    Method
+    ------
+
+    Calculates the voltage difference between the two nodes between which the
+    element of interest is connected. Also calculates the current through this
+    element according to the element type.
+    """
     s = symbols('s')
     ind = e_t.index(ident)
     origin_node, ending_node, value_of_element = o[ind], d[ind], e_v[ind]
@@ -163,20 +254,30 @@ def output_tf_calc(solution, o, d, e_v, e_t, ident, output_var):
 
 def input_output_calculation(sol, or_list, des_list, element_type,
                              element_value, voltage_sources_num):
+    """
+    Function calculates the transfer function as demanded by the user.
 
-    '''This functions interfaces the gui functionality provided by gui_tf_io.py
-    with this program. Once the netlist entered by the user passes all the
-    checks the user has to select the input and output of the transfer function
-    Input value is directly received by this function from gui_tf_io.py
-    Output value has to be calculated. gui_tf_io.py creates two variables
-    for sending the output demanded.
+    Parameters
+    ----------
 
-    For eg: if current through element L1 in any circuit is demanded,
-    output_type variable is set to I
-    ele_identifier is set to L1.
+    - **sol**: dictionary containing solutions of the circuit unknowns
+    - **or_list**: list containing the originating nodes in the circuit
+    - **des_list**: list containing the terminating nodes in the circuit
+    - **element_value**: list containing the values of elements in the circuit
+    - **element_type**: list containing the type of elements in the circuit
+    - **voltage_sources_num**: number of voltage sources in the circuit
 
-    This information is used by the called function output_tf_calc
-    '''
+    Calls Options method of module gui_control for displaying time response,
+    bode, nyquist plot for the computed transfer function.
+
+    Method
+    ------
+
+    Calculates the input as selected by the user. Calculates the output
+    transfer function by calling output_tf_calc and then calculates
+    coefficients of the resulting transfer function and calls the methods of
+    inbuilt control module of Python with these coefficients.
+    """
     s = symbols('s')
     gui_tf_input_calc = gui_io.Input_selection(element_type, element_value,
                                                voltage_sources_num)
@@ -195,6 +296,50 @@ def input_output_calculation(sol, or_list, des_list, element_type,
 
 
 def nodal_matrix(cond, v, val, v_t, n_nodes, n_voltsrc, ele_type, dep_sources):
+    """
+    Create the matrices required for nodal analysis of the system.
+
+    Parameters
+    ----------
+
+    - **cond**: conductance matrix for the system
+    - **v**: voltage matrix of the system
+    - **val**: list of element values of the system
+    - **v_t**: voltage_trans matrix for the system
+    - **n_nodes**: number of nodes for the system
+    - **n_voltsrc**: number of voltage sources for the system
+    - **ele_type**: list of element types of the netlist
+    - **dep_sources**: matrix of zeros for dependent sources
+
+    Nodal analysis involves solving some linear equations given in matrix
+    representation as Ax=b
+
+    Returns
+    -------
+
+    - **unknowns**: Matrix of the unknown node voltages and source current
+                    represented by x in Ax=b
+    - **tot_mat**: Matrix developed from the cond, v,v_t and dep_sources
+                   represented by A in Ax=b
+    - **rhs**: Matrix prepared from the current through each node and voltage
+               sources represented by b in Ax=b
+
+    Method
+    ------
+
+    if there are 4 nodes in the circuit and one voltage source in the circuit
+    then unknowns = transpose([V_1, V_2, V_3, I_V1])
+
+    tot_mat is prepared in the following way
+    ------------------
+    |cond|     v     |
+    ------------------
+    |v_t |dep_sources|
+    ------------------
+
+    rhs[i][0] stores the current though node i if i<=n_nodes
+    rhs[j][0] stores the value of the voltage source  numbered j-(n_nodes)
+    """
     tot_mat_upper = cond.row_join(v)
     tot_mat_down = v_t.row_join(dep_sources)
     tot_mat = tot_mat_upper.col_join(tot_mat_down)
@@ -215,15 +360,32 @@ def nodal_matrix(cond, v, val, v_t, n_nodes, n_voltsrc, ele_type, dep_sources):
 
 
 def check_circuit_error(unknowns, tot_mat, rhs):
+    """
+    Solve the nodal analysis equations.
 
-    '''Handles exceptions that may arise due to errors in the circuit entered
-     by the user.If there are two voltage sources in parallel in the circuit
-     there may be two possible cases:
-        -They are of the same value-in which case one voltage source is enough
-        -They are of different value-which is not possible practically
-    Both of the above cases lead to non-invertibility of the main matrix in
-    nodal analysis. Thus both of them are handled.
-    '''
+    Nodal analysis equation: Ax=b
+
+    Parameters
+    ----------
+
+    **unknowns**: x in the nodal analysis equations
+    **tot_mat**: A in the nodal analysis equations
+    **rhs**: b in the nodal analysis equations
+
+    Returns
+    -------
+
+    **soln**: solution of the nodal analysis equations
+
+    Method
+    ------
+
+    If there are unnecessary voltage sources in the circuit the matrix A is not
+    invertible. Such errors are handled in this function.
+    x is calculated if A is invertible as inv(A)*b
+    If A is not invertible thereby signifying circuit error user is given the
+    option of re-entering circuit netlist.
+    """
     soln = {}
     error_flag = 0
     for x in range(np.shape(unknowns)[0]):
@@ -240,7 +402,18 @@ def check_circuit_error(unknowns, tot_mat, rhs):
 
 
 def main():
+    """
+    Input accepted from user for netlist.
 
+    If there is an error in the circuit entered by user, user is asked whether
+    s/he wants to re-enter.
+
+    After a proper circuit is entered by user, the circuit is solved by calling
+    function **check_circuit_error**.
+
+    transfer function is then computed in the function
+    **input_output_calculation**.
+    """
     continue_flag = 0
     gui_inputs = gui.Input_screen()
     if gui_inputs.error_flag == 1:

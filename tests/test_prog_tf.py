@@ -1,7 +1,12 @@
-from sympy import symbols
-from sympy.matrices import Matrix
+"""symbols and Matric are imported from sympy library.
+
+os and sys are used to access the program that is being tested and present
+in the cc_params directory.
+"""
 import os
 import sys
+from sympy import symbols
+from sympy.matrices import Matrix
 module_path = os.path.dirname(os.path.pardir + os.path.sep)
 module_path = os.path.join(module_path, "cc_params")
 sys.path.insert(0, os.path.abspath(module_path))
@@ -9,9 +14,9 @@ import prog_tf as prog
 
 
 def test_conductance_matrix():
+    """
+    Test the formation of the conductance matrix for 4 given networks.
 
-    '''
-    This tests the formation of the conductance matrix for 4 given networks:
     Network1: Voltage source is not connected to the ground.
     Network2: A simple series RLC circuit
     Network3: A network with three elements connected between two nodes
@@ -21,7 +26,7 @@ def test_conductance_matrix():
     test functions. The attribute used is will_run.
 
     To run this test use: nosetests -a will_run test_prog_tf.py
-    '''
+    """
     s = symbols('s')
     o, d = [1, 0, 2, 1], [0, 2, 3, 3]
     e, v = ["R1", "R2", "R3", "V1"], [0.2, 0.2, 0.2, 5]
@@ -47,15 +52,15 @@ def test_conductance_matrix():
 
 
 def test_voltage_matrix():
+    """
+    Test the formation of the volatge matrix required for nodal analysis.
 
-    '''
-    This tests the formation of the volatge matrix required for nodal analysis.
     One test case is constructed with two volatge sources, where one source is
     between ground(reference node) and node 1 and another voltage source is
     between nodes 2 and 3
 
     Again attribute will_run is added to this function
-    '''
+    """
     o, d = [1, 3, 1, 2, 3], [2, 2, 0, 0, 0]
     e = ["R1", "V1", "V2", "R2", "R3"]
     (v, v_t, dep) = prog.set_volt_matrix(o, d, e)
@@ -65,8 +70,9 @@ def test_voltage_matrix():
 
 
 def test_output_tf_calc():
+    """
+    Test output of the function output_tf_calc of prog_tf.py.
 
-    '''This is a test for the function output_tf_calc of prog_tf.py.
     This creates the appropriate netlist for a simple series RLC circuit
     with the following parameters.
     V = 10V
@@ -79,7 +85,7 @@ def test_output_tf_calc():
     capacitor, voltage across voltage source is tested.
 
     Atrribute will_run is also attached to this test function
-    '''
+    """
     s = symbols('s')
     sol = {}
     impedance = (s**2*1e-8+s*1e-5+1.0)/(s*1e-6)
@@ -101,7 +107,10 @@ def test_output_tf_calc():
 
 
 def test_nodal_matrix():
+    """Test the formation of the 3 matrices required for solving nodal analysis.
 
+    A simple series RLC circuit is taken for testing
+    """
     s, V_1, V_2 = symbols('s'), symbols('V_1'), symbols('V_2')
     V_3, I_V1 = symbols('V_3'), symbols('I_V1')
     m = Matrix([[0.2, -0.2, 0.0, -1.0], [-0.2, 0.2+0.1/s, -0.1/s, 0.0],
@@ -117,7 +126,7 @@ def test_nodal_matrix():
                                   ele_type, dep)
     assert(mat, u, r) == (m, unknowns, rhs)
 
-
+# Atrribute will_run is added to all the test functions
 test_conductance_matrix.will_run = True
 test_voltage_matrix.will_run = True
 test_output_tf_calc.will_run = True
