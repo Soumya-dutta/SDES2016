@@ -6,17 +6,21 @@
 Welcome to Circuit-Control-Parameters's documentation!
 ======================================================
 
-Contents:
+Circuit control Parameters is an application for getting different control parameters of a circuit.
+
+Overview
+--------
 
 .. toctree::
    :maxdepth: 2
+
+   overview.rst
 
 
 
 Indices and tables
 ==================
 
-* :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
 
