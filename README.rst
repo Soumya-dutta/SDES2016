@@ -2,6 +2,14 @@
 Circuit Control Parameters
 ==========================
 
+|Documentation|
+
+.. |Documentation| 
+.. image:: https://readthedocs.org/projects/circuit-control-parameters/badge/?version=latest
+:target: http://circuit-control-parameters.readthedocs.io/en/latest/?badge=latest
+:alt: Documentation Status
+
+
 Circuit Control Parameters is an application that allows one to view different control parameters of an electrical circuit. This has been
 developed keeping in mind the problems that arise in actually specifying the circuit to different softwares such as **MATLAB** and even Python's own control module. In most cases (if we are not using **Simulink** in **MATLAB**), we have to compute the transfer function by
 hand, and provide this transfer function as coefficients to the software.
