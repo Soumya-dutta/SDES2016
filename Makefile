@@ -1,3 +1,4 @@
+.PHONY: runtests runapp
 runtests:
 	nosetests -a will_run tests/test_prog_tf.py
 

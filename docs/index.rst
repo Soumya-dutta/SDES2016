@@ -21,5 +21,16 @@ Overview
 Contents
 ========
 
+.. toctree::
+    :maxdepth: 2
+
+    source/prog_tf.rst
+    source/gui_input.rst
+    source/gui_tf_io.rst
+    source/gui_control.rst
+
+Index of Modules
+================
+
 * :ref:`modindex`
 
