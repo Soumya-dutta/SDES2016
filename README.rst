@@ -31,7 +31,14 @@ Installation
 
 - $ cd circuit_control_parameters
 
+- $ sudo apt-get install python-pip
+
 - $ python setup.py install
+
+Some issues
+-----------
+
+**The present version as of now is not running with Python 3.5. This will be attempted to be corrected in the next version**
 
 Testing the Application
 -----------------------
