@@ -2,7 +2,7 @@ import sys
 import subprocess
 from setuptools import setup, find_packages
 
-requires = ["numpy", "sympy", "control", "matplotlib"]
+subprocess.call(["pip", "install", "-r", "requirements.txt"])
 subprocess.call(["sudo", "apt-get", "install", "python-tk"])
 
 setup(
@@ -13,6 +13,6 @@ setup(
       author='Soumya Dutta, Aveek Podder',
       author_email='soumya.besuee@gmail.com, questions54@gmail.com',
       license='GPL3',
-      install_requires=requires,
+      install_requires=[],
       packages=find_packages(),
       )
