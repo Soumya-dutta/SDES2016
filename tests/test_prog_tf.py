@@ -129,15 +129,10 @@ def test_nodal_matrix():
 
 def test_check_netlist_error():
     """Test the function check_netlist_error of prog_tf.py."""
-    origin, dest = [1, -2, 3, 1], [2, 3, 0, 0]
+    origin, dest = [1, -2, 3, 1], [-2, 3, 0, 0]
     ele_type, val = ['R1', 'L1', 'C1', 'V1'], [10, 0.01, 0.001, 10]
     e_flag, e_msg = prog.check_netlist_error(origin, dest, ele_type, val)
     assert(e_flag, e_msg) == (1, "Negative value of node.")
-
-    origin, dest = [1, 2, 3, 1], [2, 3, 0, 0]
-    ele_type, val = ['R1', 'L1', 'C1', 'V1'], [0, 0.01, 0.001, 10]
-    e_flag, e_msg = prog.check_netlist_error(origin, dest, ele_type, val)
-    assert(e_flag, e_msg) == (1, "Zero value")
 
     origin, dest = [1, 2, 3, 1], [2, 3, 0, 0]
     ele_type, val = ['R1', 'L1', 'C1', 'V1'], [-10, 0.01, 0.001, 10]
@@ -153,6 +148,26 @@ def test_check_netlist_error():
     ele_type, val = ['R1', 'L1', 'V1'], [10, 0.01, 0.001, 10]
     e_flag, e_msg = prog.check_netlist_error(origin, dest, ele_type, val)
     assert(e_flag, e_msg) == (1, "You have not entered all identifiers.")
+
+    origin, dest = [1, 2, 3, 1], [1, 3, 0, 0]
+    ele_type, val = ['R1', 'L1', 'C1', 'V1'], [10, 0.01, 0.001, -10]
+    e_flag, e_msg = prog.check_netlist_error(origin, dest, ele_type, val)
+    assert(e_flag, e_msg) == (1, "Same value of origin and destination node")
+
+    origin, dest = [1, 2, 3, 10], [2, 3, 10, 0]
+    ele_type, val = ['R1', 'L1', 'C1', 'V1'], [10, 0.01, 0.001, 10]
+    e_flag, e_msg = prog.check_netlist_error(origin, dest, ele_type, val)
+    assert(e_flag, e_msg) == (1, "Your circuit is not connected.")
+
+    origin, dest = [1, 2, 3, 4], [2, 3, 4, 1]
+    ele_type, val = ['R1', 'L1', 'C1', 'V1'], [10, 0.01, 0.001, 10]
+    e_flag, e_msg = prog.check_netlist_error(origin, dest, ele_type, val)
+    assert(e_flag, e_msg) == (1, "No reference node")
+
+    origin, dest = [1, 2, 3, 4], [2, 3, 1, 4]
+    ele_type, val = ['R1', 'L1', 'C1', 'V1'], [10, 0.01, 0.001, 10]
+    e_flag, e_msg = prog.check_netlist_error(origin, dest, ele_type, val)
+    assert(e_flag, e_msg) == (1, "Multiple Errors")
 
     origin, dest = [1, 2, 3, 1], [2, 3, 0, 0]
     ele_type, val = ['R1', 'L1', 'C1', 'V1'], [10, 0.01, 0.001, -10]

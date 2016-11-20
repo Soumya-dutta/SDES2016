@@ -419,6 +419,10 @@ def check_netlist_error(origin, dest, ele_type, val_list):
 
     - Zero value of V
 
+    - Same value of origin and destination node
+
+    - Underlying graph is disconnected
+
     Returns:
 
     - error_flag: set to 1 if any exceptions occur
@@ -426,27 +430,41 @@ def check_netlist_error(origin, dest, ele_type, val_list):
     - error_msg: the message describing the error that has occurred
 
     """
-    error_flag, error_msg = 0, ""
+    error_flag, error_msg, error_count = 0, "", 0
+    if 0 not in origin+dest:
+        error_flag, error_count = 1, error_count+1
+        error_msg = "No reference node"
+    if len(set(origin+dest)) != len(origin):
+        error_flag, error_count = 1, error_count+1
+        error_msg = "Your circuit is not connected."
     if len(ele_type) < len(val_list):
-        error_flag = 1
+        error_flag, error_count = 1, error_count+1
         error_msg = "You have not entered all identifiers."
     check_source = len([1 for x in ele_type if 'V' in x])
     if check_source == 0:
-        error_flag = 1
+        error_flag, error_count = 1, error_count+1
         error_msg = "You have forgotten to enter sources"
     check_negative_origin = any(n < 0 for n in origin)
     check_negative_dest = any(n < 0 for n in dest)
     if check_negative_dest is True or check_negative_origin is True:
         error_msg = "Negative value of node."
-        error_flag = 1
+        error_flag, error_count = 1, error_count+1
+    origin_dest_match = [origin[x] for x in range(len(origin))
+                         if origin[x] == dest[x]]
+    if len(origin_dest_match) > 0:
+        error_flag, error_count = 1, error_count+1
+        error_msg = "Same value of origin and destination node"
     for ind in range(len(val_list)):
         if val_list[ind] <= 0 and 'V' not in ele_type[ind]:
             error_msg = "Non-positive value of R/L/C"
-            error_flag = 1
+            error_flag, error_count = 1, error_count+1
         if val_list[ind] == 0:
             error_msg = "Zero value"
-            error_flag = 1
-    return error_flag, error_msg
+            error_flag, error_count = 1, error_count+1
+    if error_count == 1 or error_count == 0:
+        return error_flag, error_msg
+    else:
+        return error_flag, "Multiple Errors"
 
 
 def main():
