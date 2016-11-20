@@ -126,8 +126,41 @@ def test_nodal_matrix():
                                   ele_type, dep)
     assert(mat, u, r) == (m, unknowns, rhs)
 
+
+def test_check_netlist_error():
+    """Test the function check_netlist_error of prog_tf.py."""
+    origin, dest = [1, -2, 3, 1], [2, 3, 0, 0]
+    ele_type, val = ['R1', 'L1', 'C1', 'V1'], [10, 0.01, 0.001, 10]
+    e_flag, e_msg = prog.check_netlist_error(origin, dest, ele_type, val)
+    assert(e_flag, e_msg) == (1, "Negative value of node.")
+
+    origin, dest = [1, 2, 3, 1], [2, 3, 0, 0]
+    ele_type, val = ['R1', 'L1', 'C1', 'V1'], [0, 0.01, 0.001, 10]
+    e_flag, e_msg = prog.check_netlist_error(origin, dest, ele_type, val)
+    assert(e_flag, e_msg) == (1, "Zero value")
+
+    origin, dest = [1, 2, 3, 1], [2, 3, 0, 0]
+    ele_type, val = ['R1', 'L1', 'C1', 'V1'], [-10, 0.01, 0.001, 10]
+    e_flag, e_msg = prog.check_netlist_error(origin, dest, ele_type, val)
+    assert(e_flag, e_msg) == (1, "Non-positive value of R/L/C")
+
+    origin, dest = [1, 2, 3, 1], [2, 3, 0, 0]
+    ele_type, val = ['R1', 'L1', 'C1', 'V1'], [10, 0.01, 0.001, 0]
+    e_flag, e_msg = prog.check_netlist_error(origin, dest, ele_type, val)
+    assert(e_flag, e_msg) == (1, "Zero value")
+
+    origin, dest = [1, 2, 3, 1], [2, 3, 0, 0]
+    ele_type, val = ['R1', 'L1', 'V1'], [10, 0.01, 0.001, 10]
+    e_flag, e_msg = prog.check_netlist_error(origin, dest, ele_type, val)
+    assert(e_flag, e_msg) == (1, "You have not entered all identifiers.")
+
+    origin, dest = [1, 2, 3, 1], [2, 3, 0, 0]
+    ele_type, val = ['R1', 'L1', 'C1', 'V1'], [10, 0.01, 0.001, -10]
+    e_flag, e_msg = prog.check_netlist_error(origin, dest, ele_type, val)
+    assert(e_flag, e_msg) == (0, "")
 # Atrribute will_run is added to all the test functions
 test_conductance_matrix.will_run = True
 test_voltage_matrix.will_run = True
 test_output_tf_calc.will_run = True
 test_nodal_matrix.will_run = True
+test_check_netlist_error.will_run = True

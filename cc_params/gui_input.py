@@ -111,8 +111,6 @@ class Input_screen():
         self.destination_list = []
         self.ele_type = []
         self.val_list = []
-        self.error_msg = ""
-        self.error_flag = 0
         self.root = Tk()
         self.root.title("Enter the netlist")
         self.accept_number_of_elements()
@@ -211,64 +209,8 @@ class Input_screen():
             elif i.get() == "Capacitance in Farad":
                 cap += 1
                 self.ele_type.append('C' + str(cap))
-        self.check_netlist_error()
-
-    def check_netlist_error(self):
-        """
-        Exception due to errors in netlist input by user handled.
-
-        List of exceptions handled are:-
-
-        - Negative value of nodes
-
-        - No voltage sources in netlist
-
-        - Negative/Zero value of R,L,C
-
-        - Zero value of V
-
-        If negative value of the voltage source is given the origin and
-        destination nodes of the source are reversed for computational
-        simplicity
-
-        Whenever an error is encountered in the netlist error_flag is set 1.
-        An error_msg is also created appropriately. Both of these are handled
-        by the program prog_tf.py
-        """
-        if len(self.ele_type) < len(self.val_list):
-            self.error_flag = 1
-            self.error_msg = "You have not entered all identifiers."
-            self.root.destroy()
-            return
-        check_source = len([1 for x in self.ele_type if 'V' in x])
-        if check_source == 0:
-            self.error_flag = 1
-            self.error_msg = "You have forgotten to enter sources"
-            self.root.destroy()
-            return
-        check_negative_origin = any(n < 0 for n in self.origin_list)
-        check_negative_dest = any(n < 0 for n in self.destination_list)
-        if check_negative_dest == True or check_negative_origin == True:
-            self.error_msg = "Negative value of node."
-            self.error_flag = 1
-            self.root.destroy()
-            return
-        for ind in range(len(self.val_list)):
-            if self.val_list[ind] <= 0 and 'V' not in self.ele_type[ind]:
-                self.error_msg = "Non-positive value of R/L/C"
-                self.error_flag = 1
-                self.root.destroy()
-                return
-            if self.val_list[ind] == 0:
-                self.error_msg = "Zero value"
-                self.error_flag = 1
-                self.root.destroy()
-                return
-            if self.val_list[ind] < 0 and 'V' in self.ele_type[ind]:
-                self.val_list[ind] = abs(self.val_list[ind])
-                o, d = self.origin_list[ind], self.destination_list[ind]
-                self.origin_list[ind], self.destination_list[ind] = d, o
         self.root.destroy()
+
 
 if __name__ == '__main__':
     new = Input_screen()

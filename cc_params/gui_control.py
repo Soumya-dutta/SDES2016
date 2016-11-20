@@ -24,10 +24,7 @@ class Options():
     """
 
     def __init__(self, numerator, denominator):
-        """
-        Create a GUI window with title Control Parameter Options
-
-        """
+        """Create a GUI window with title Control Parameter Options."""
         self.n = numerator
         self.d = denominator
         self.root = Tk()

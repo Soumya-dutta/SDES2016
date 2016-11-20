@@ -395,6 +395,60 @@ def check_circuit_error(unknowns, tot_mat, rhs):
         return soln
 
 
+def check_netlist_error(origin, dest, ele_type, val_list):
+    """
+    Exception due to errors in netlist input by user handled.
+
+    Parameters:
+
+    - origin: list of all originating nodes in the netlist
+
+    - dest: list of all terminating nodes in the netlist
+
+    - ele_type: list of all the element identifiers in the netlist
+
+    - val_list: list of values of all elements in the netlist
+
+    List of exceptions handled are:-
+
+    - Negative value of nodes
+
+    - No voltage sources in netlist
+
+    - Negative/Zero value of R,L,C
+
+    - Zero value of V
+
+    Returns:
+
+    - error_flag: set to 1 if any exceptions occur
+
+    - error_msg: the message describing the error that has occurred
+
+    """
+    error_flag, error_msg = 0, ""
+    if len(ele_type) < len(val_list):
+        error_flag = 1
+        error_msg = "You have not entered all identifiers."
+    check_source = len([1 for x in ele_type if 'V' in x])
+    if check_source == 0:
+        error_flag = 1
+        error_msg = "You have forgotten to enter sources"
+    check_negative_origin = any(n < 0 for n in origin)
+    check_negative_dest = any(n < 0 for n in dest)
+    if check_negative_dest is True or check_negative_origin is True:
+        error_msg = "Negative value of node."
+        error_flag = 1
+    for ind in range(len(val_list)):
+        if val_list[ind] <= 0 and 'V' not in ele_type[ind]:
+            error_msg = "Non-positive value of R/L/C"
+            error_flag = 1
+        if val_list[ind] == 0:
+            error_msg = "Zero value"
+            error_flag = 1
+    return error_flag, error_msg
+
+
 def main():
     """
     Input accepted from user for netlist.
@@ -410,14 +464,16 @@ def main():
     """
     continue_flag = 0
     gui_inputs = gui.Input_screen()
-    if gui_inputs.error_flag == 1:
-        gui_input_error = gui.Error(gui_inputs.error_msg)
+    or_nodes = gui_inputs.origin_list
+    des_nodes = gui_inputs.destination_list
+    type_of_element, value = gui_inputs.ele_type, gui_inputs.val_list
+    error_flag, error_msg = check_netlist_error(or_nodes, des_nodes,
+                                                type_of_element, value)
+    if error_flag == 1:
+        gui_input_error = gui.Error(error_msg)
         if gui_input_error.decision == "Yes":
             main()
     else:
-        or_nodes = gui_inputs.origin_list
-        des_nodes = gui_inputs.destination_list
-        type_of_element, value = gui_inputs.ele_type, gui_inputs.val_list
         continue_flag = 1
     if continue_flag == 1:
         conductance, num_nodes = set_cond_matrix(or_nodes, des_nodes,
