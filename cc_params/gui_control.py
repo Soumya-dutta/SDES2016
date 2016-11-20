@@ -41,6 +41,7 @@ class Options():
 
         - If the transfer function is constant it is displayed in the terminal
           and the window closes.
+
         - If the transfer function is not constant three different options
           are provided to the user.
 

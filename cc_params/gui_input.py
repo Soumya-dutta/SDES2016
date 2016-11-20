@@ -72,20 +72,18 @@ class Input_screen():
     input interface for the user for entering the netlist. Errors are also
     checked.
 
-    **Variables**
+    ``Variables``
 
-    - origin_node_list[]: list of originating nodes as Tkinter objects
-    - destination_node_list[]: list of terminating nodes as Tkinter
-                                   objects
-    - element_type_list[]: list of types of element as Tkinter objects
-    - element_value_list[]: list of values of element as Tkinter
-                                objects
-    - origin_list[]: list of originating nodes in circuit
-    - destination_list[]: list of terminating nodes in circuit
-    - ele_type[]: list of element types in circuit
-    - val_list[]: list of element values in circuit
-    - error_msg: stores the error message in case there is an error
-    - error_flag: set to 1 if there is an error else 0
+    origin_node_list[]: list of originating nodes as Tkinter objects
+    destination_node_list[]: list of terminating nodes as Tkinter objects
+    element_type_list[]: list of types of element as Tkinter objects
+    element_value_list[]: list of values of element as Tkinter objects
+    origin_list[]: list of originating nodes in circuit
+    destination_list[]: list of terminating nodes in circuit
+    ele_type[]: list of element types in circuit
+    val_list[]: list of element values in circuit
+    error_msg: stores the error message in case there is an error
+    error_flag: set to 1 if there is an error else 0
     """
 
     def __init__(self):
@@ -131,9 +129,13 @@ class Input_screen():
         User enters netlist in rows provided based on number of elements.
 
         The user has to enter the netlist under the following heads
+
         - From: Origin node of elements
+
         - To: Destination node of elements
+
         - Type of element to be selected from drop-down menu
+
         - Value: Value of the element entered.
 
         Once netlist is entered user has to click on Save to load the netlist.
@@ -168,10 +170,15 @@ class Input_screen():
         Store the netlist data in the form of lists.
 
         The lists created are as follows:-
+
         - origin_list : Stores all the origin nodes of netlist
+
         - destination_list : Stores all the destination nodes of netlist
+
         - val_list : Stores the values of the different elements of circuit
+
         - ele_type : Stores the types of passive elements in circuit
+
         """
         volt, res, ind, cap = 0, 0, 0, 0
         for i in self.origin_node_list:
@@ -200,9 +207,13 @@ class Input_screen():
         Exception due to errors in netlist input by user handled.
 
         List of exceptions handled are:-
+
         - Negative value of nodes
+
         - No voltage sources in netlist
+
         - Negative/Zero value of R,L,C
+
         - Zero value of V
 
         If negative value of the voltage source is given the origin and
