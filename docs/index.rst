@@ -18,9 +18,13 @@ Overview
 
 
 
-Indices and tables
-==================
+Contents
+========
 
 * :ref:`modindex`
+
+Search
+======
+
 * :ref:`search`
 
