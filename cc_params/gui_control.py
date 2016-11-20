@@ -20,12 +20,13 @@ class Options():
         """
         Create a GUI window with title Control Parameter Options.
 
-        Parameters
-        ----------
+        **Parameters**
+
         - numerator: numerator of the transfer function calculated in
-         prog_tf.py
+          prog_tf.py
         - denominator: denominator of the transfer function calculated in
-         prog_tf.py
+          prog_tf.py
+
         """
         self.n = numerator
         self.d = denominator
@@ -39,9 +40,9 @@ class Options():
         Function displays the different options that are given to the user.
 
         - If the transfer function is constant it is displayed in the terminal
-        and the window closes.
+          and the window closes.
         - If the transfer function is not constant three different options
-        are provided to the user.
+          are provided to the user.
 
             - time-domain response for which function step is called
             - Bode plot for which function bode is called
@@ -82,6 +83,7 @@ class Options():
 
         - T: timestamp against the response
         - yout: actual response data
+
         They are then plotted using matplotlib
         """
         T, yout = control.step_response(self.sys)

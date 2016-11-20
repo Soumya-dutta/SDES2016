@@ -19,10 +19,9 @@ class Error():
         """
         Initialize an Instance of the class Error.
 
-        Parameters
-        ----------
+        **Parameters**
 
-        - **msg**: error message to inform the user of the error in the circuit
+        - msg: error message to inform the user of the error in the circuit
 
         Creates a GUI window with title Re-enter Netlist?
         """
@@ -72,6 +71,21 @@ class Input_screen():
     Asks user for number of elements in the circuit. Creates a table sort of
     input interface for the user for entering the netlist. Errors are also
     checked.
+
+    **Variables**
+
+    - origin_node_list[]: list of originating nodes as Tkinter objects
+    - destination_node_list[]: list of terminating nodes as Tkinter
+                                   objects
+    - element_type_list[]: list of types of element as Tkinter objects
+    - element_value_list[]: list of values of element as Tkinter
+                                objects
+    - origin_list[]: list of originating nodes in circuit
+    - destination_list[]: list of terminating nodes in circuit
+    - ele_type[]: list of element types in circuit
+    - val_list[]: list of element values in circuit
+    - error_msg: stores the error message in case there is an error
+    - error_flag: set to 1 if there is an error else 0
     """
 
     def __init__(self):
@@ -79,23 +93,6 @@ class Input_screen():
         Initialize Instance of class Input_screen.
 
         Create GUI window with title Enter the netlist
-
-        Variables
-        ---------
-
-        - **origin_node_list[]**: list of originating nodes as Tkinter objects
-        - **destination_node_list[]**: list of terminating nodes as Tkinter
-                                       objects
-        - **element_type_list[]**: list of types of element as Tkinter objects
-        - **element_value_list[]**: list of values of element as Tkinter
-                                    objects
-        - **origin_list[]**: list of originating nodes in circuit
-        - **destination_list[]**: list of terminating nodes in circuit
-        - **ele_type[]**: list of element types in circuit
-        - **val_list[]**: list of element values in circuit
-        - **error_msg**: stores the error message in case there is an error
-        - **error_flag**: set to 1 if there is an error else 0
-
         """
         self.origin_node_list = []
         self.destination_node_list = []

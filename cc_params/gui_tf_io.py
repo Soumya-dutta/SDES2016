@@ -15,12 +15,11 @@ class Input_selection():
         """
         Initialize Instance of class Input_selection.
 
-        Parameters
-        ----------
+        **Parameters**
 
-        - **identifiers**: list of types of elements in the circuit
-        - **values**: list of element values in the circuit
-        - **number_of_options**: number of voltage sources in circuit.
+        - identifiers: list of types of elements in the circuit
+        - values: list of element values in the circuit
+        - number_of_options: number of voltage sources in circuit.
 
         A GUI with title Select your input for transfer function is created.
         """
@@ -65,10 +64,9 @@ class Output_selection():
         """
         Initialize Instance of class Output_selection.
 
-        Parameters
-        ----------
+        **Parameters**
 
-        - **identifiers**: list of types of elements in the circuit.
+        - identifiers: list of types of elements in the circuit.
 
         A GUI with title Select your output for transfer function is created.
         """
