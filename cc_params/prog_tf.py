@@ -203,7 +203,7 @@ def output_tf_calc(solution, o, d, e_v, e_t, ident, output_var):
 
     - ident: identifier of the required element whose output parameter is asked
 
-    -output_var: I if current is demanded, else V
+    - output_var: I if current is demanded, else V
 
     Returns:
 
