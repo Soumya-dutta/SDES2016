@@ -91,9 +91,9 @@ qthelp:
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
-	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/Circuit-Control-Parameters.qhcp"
+	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/Circuit-Control_Parameters.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/Circuit-Control-Parameters.qhc"
+	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/Circuit-Control_Parameters.qhc"
 
 .PHONY: applehelp
 applehelp:
@@ -110,8 +110,8 @@ devhelp:
 	@echo
 	@echo "Build finished."
 	@echo "To view the help file:"
-	@echo "# mkdir -p $$HOME/.local/share/devhelp/Circuit-Control-Parameters"
-	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/Circuit-Control-Parameters"
+	@echo "# mkdir -p $$HOME/.local/share/devhelp/Circuit-Control_Parameters"
+	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/Circuit-Control_Parameters"
 	@echo "# devhelp"
 
 .PHONY: epub
