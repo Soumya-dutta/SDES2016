@@ -27,6 +27,8 @@ Software Requirements
 Installation
 ------------
 
+Please note that you are supposed to be logged in as root whiledoing the following steps
+
 - $ git clone https://bitbucket.org/sdes2016/circuit_control_parameters
 
 - $ cd circuit_control_parameters
