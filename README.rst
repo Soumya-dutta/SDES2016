@@ -27,9 +27,11 @@ Software Requirements
 Installation
 ------------
 
-$ git clone https://bitbucket.org/sdes2016/circuit_control_parameters
-$ cd circuit_control_parameters
-$ python setup.py install
+- $ git clone https://bitbucket.org/sdes2016/circuit_control_parameters
+
+- $ cd circuit_control_parameters
+
+- $ python setup.py install
 
 Testing the Application
 -----------------------
