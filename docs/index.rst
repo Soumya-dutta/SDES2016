@@ -23,8 +23,3 @@ Contents
 
 * :ref:`modindex`
 
-Search
-======
-
-* :ref:`search`
-
