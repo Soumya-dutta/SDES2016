@@ -13,19 +13,19 @@ class Options():
     """
     Create GUI window for different control parameters of the system.
 
+    Parameters:
+
+    - numerator: numerator of the transfer function calculated in
+      prog_tf.py
+    - denominator: denominator of the transfer function calculated in
+      prog_tf.py
+
     Options provided are time response, bode plot and nyquist plot.
     """
 
     def __init__(self, numerator, denominator):
         """
-        Create a GUI window with title Control Parameter Options.
-
-        **Parameters**
-
-        - numerator: numerator of the transfer function calculated in
-          prog_tf.py
-        - denominator: denominator of the transfer function calculated in
-          prog_tf.py
+        Create a GUI window with title Control Parameter Options
 
         """
         self.n = numerator
@@ -46,7 +46,9 @@ class Options():
           are provided to the user.
 
             - time-domain response for which function step is called
+
             - Bode plot for which function bode is called
+
             - Nyquist plot for which function nyq is called
 
         Radio buttons are the input method for the user.
@@ -83,6 +85,7 @@ class Options():
         Uses the step_response function of control module to get two arrays
 
         - T: timestamp against the response
+
         - yout: actual response data
 
         They are then plotted using matplotlib

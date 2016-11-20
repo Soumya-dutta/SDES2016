@@ -13,15 +13,16 @@ class Error():
     Handles if error is present in the circuit/netlist.
 
     Gives the option of re-entering.
+
+    ``Parameters``
+
+    - msg: error message to inform the user of the error in the circuit
+
     """
 
     def __init__(self, msg):
         """
         Initialize an Instance of the class Error.
-
-        **Parameters**
-
-        - msg: error message to inform the user of the error in the circuit
 
         Creates a GUI window with title Re-enter Netlist?
         """
@@ -74,16 +75,26 @@ class Input_screen():
 
     ``Variables``
 
-    origin_node_list[]: list of originating nodes as Tkinter objects
-    destination_node_list[]: list of terminating nodes as Tkinter objects
-    element_type_list[]: list of types of element as Tkinter objects
-    element_value_list[]: list of values of element as Tkinter objects
-    origin_list[]: list of originating nodes in circuit
-    destination_list[]: list of terminating nodes in circuit
-    ele_type[]: list of element types in circuit
-    val_list[]: list of element values in circuit
-    error_msg: stores the error message in case there is an error
-    error_flag: set to 1 if there is an error else 0
+    - origin_node_list[]: list of originating nodes as Tkinter objects
+
+    - destination_node_list[]: list of terminating nodes as Tkinter objects
+
+    - element_type_list[]: list of types of element as Tkinter objects
+
+    - element_value_list[]: list of values of element as Tkinter objects
+
+    - origin_list[]: list of originating nodes in circuit
+
+    - destination_list[]: list of terminating nodes in circuit
+
+    - ele_type[]: list of element types in circuit
+
+    - val_list[]: list of element values in circuit
+
+    - error_msg: stores the error message in case there is an error
+
+    - error_flag: set to 1 if there is an error else 0
+
     """
 
     def __init__(self):
@@ -220,7 +231,7 @@ class Input_screen():
         destination nodes of the source are reversed for computational
         simplicity
 
-        Whenever an error is encountered in the netlist error_flag is set 1
+        Whenever an error is encountered in the netlist error_flag is set 1.
         An error_msg is also created appropriately. Both of these are handled
         by the program prog_tf.py
         """

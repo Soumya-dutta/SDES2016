@@ -9,17 +9,21 @@ import Tkinter as tk
 
 
 class Input_selection():
-    """Class for creating GUI for input selection by user."""
+    """Class for creating GUI for input selection by user.
+
+    Parameters:
+
+    - identifiers: list of types of elements in the circuit
+
+    - values: list of element values in the circuit
+
+    - number_of_options: number of voltage sources in circuit.
+
+    """
 
     def __init__(self, identifiers, values, number_of_options):
         """
         Initialize Instance of class Input_selection.
-
-        **Parameters**
-
-        - identifiers: list of types of elements in the circuit
-        - values: list of element values in the circuit
-        - number_of_options: number of voltage sources in circuit.
 
         A GUI with title Select your input for transfer function is created.
         """
@@ -58,15 +62,17 @@ class Input_selection():
 
 
 class Output_selection():
-    """Class for creating GUI for output selection by user."""
+    """Class for creating GUI for output selection by user.
+
+    Parameters:
+
+    - identifiers: list of types of elements in the circuit.
+
+    """
 
     def __init__(self, identifiers):
         """
         Initialize Instance of class Output_selection.
-
-        **Parameters**
-
-        - identifiers: list of types of elements in the circuit.
 
         A GUI with title Select your output for transfer function is created.
         """
